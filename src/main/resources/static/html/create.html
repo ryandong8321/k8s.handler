@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Service Deployment</title>
+	<link rel="stylesheet" href="../plugin/bootstrap/bootstrap.css">
+	<link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+	<div class="wrap">
+			<div class="container">
+			   <div class="form-horizontal pri_form-horizontal">
+				<div class="form-group">
+				    <label for="" class="col-md-3 pri_invLabel">add service</label>
+				</div>
+				<div id="formGroupB">	
+					<form class="addService" action="/fileUpload" method="post" enctype="multipart/form-data">
+						<div class="formGroup">
+							<div class="infoBox">
+								<div class="form-group pri_inv-formG">
+								    <label for="" class="col-md-12 pri_invLabel_titColor"><i>yml</i><b></b></label>
+								</div>
+								<div class="form-group pri_form-group">
+									    <div class="col-md-10 pri_col-md-10">
+									    	<dl class="col-sm-3">	    									
+		    									<input id="pic" type="file" name = "yamlFile" />
+		    								</dl>
+									    </div>
+								</div>
+								<div class="form-group pri_inv-formG">
+								    <label for="" class="col-md-12 pri_invLabel_titColor"><i>files</i><b></b></label>
+								</div>
+							   	<div class="form-group pri_form-group">
+								    <div class="col-md-10 pri_col-md-10">
+								    	<div class="pri_selectG pri_selectFlex">
+										    <label for="" class="control-label pri_selectLabel1">file:</label>
+										    <dl class="col-sm-3">
+		    									<input id="pic" type="file" name = "confFile"/>
+		    								</dl>
+		    								<label for="" class="control-label pri_selectLabel1">path:</label>
+										    <dl class="col-sm-3">
+		    									<input type="type" name="pathName" class="form-control orgtext" placeholder="upload path">
+		    								</dl>
+		    								<a class="delFileBtn">delete</a>
+										</div>
+								    </div>     
+								</div>
+								<div class="addConfigFileDiv">
+									<div class="addConfigFile">
+									</div>
+									<div class="form-group pri_form-group">							    
+									    <div class="col-md-10 pri_col-md-10">
+									    	<div class="pri_selectG pri_selectFlex">
+											    <label for="" class="control-label pri_selectLabel1"></label>
+											    <div class="pri_inv_checkBox">
+					                                <a class="addConfigFileBtn">add more files+</a>
+					                            </div>
+											</div>
+									    </div>     
+									</div>
+								</div>
+							</div>
+							<div class="form-group pri_form-group">
+							    <div class="col-md-10 pri_col-md-10">
+							    	<div class="pri_selectG pri_selectFlex">
+									    <label for="" class="control-label pri_selectLabel1"></label>
+									    <div class="pri_inv_checkBox">
+			                                <a class="delBtn">delete</a>
+			                            </div>
+									</div>
+							    </div>   
+							</div>
+					    </div>
+					</form>			
+			    </div>
+			   	<div class="form-group pri_inv-formG pri_inv-formG2">
+				    <label for="" class="col-md-12 pri_invLabel_titColor" id="inv_addBtn"><i>add service</i><span class="addInvBtn"><img src="../img/add.svg" alt=""></span></label>
+				</div>
+				<div class="issueBtnG">
+					<i class="issueBtn issueBtn1 issueBtn2" id="deployBtn">OK</i>
+				</div>
+				  
+				</div>
+			</div>
+		</div>
+	<script type="text/javascript" src="../plugin/jquery/jquery.js"></script>
+	<script type="text/javascript" src="../plugin/bootstrap/bootstrap.js"></script>
+	<script type="text/javascript" src="../js/create.js"></script>
+	<script type="text/javascript" src="../js/common.js"></script>
+</body>
+</html>

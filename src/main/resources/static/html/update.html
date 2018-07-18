@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Service Update</title>
+	<link rel="stylesheet" href="../plugin/bootstrap/bootstrap.css">
+	<link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+	<div class="wrap">
+			<div class="container">
+			   <form class="form-horizontal pri_form-horizontal" id="updateService">
+				<div class="form-group">
+				    <label for="" class="col-md-3 pri_invLabel">update service</label>
+				</div>
+				<div id="formGroupB">
+					<div class="formGroup">
+							<div class="infoBox">
+								<div class="form-group pri_inv-formG">
+								    <label for="" class="col-md-12 pri_invLabel_titColor"><i>service</i><b></b></label>
+								</div>
+
+								<div class="pri_selectG pri_selectG1">
+									<div class="col-md-10 pri_col-md-10">
+								    	<div class="pri_selectG pri_selectFlex">
+											<select id="service" name="service" class="form-control pri_selecWidth pri_mine_selectWidth pri_inv_selectWidth financeScale" readonly>
+												<option value="0">allocres</option>
+												<option value="1">resolveref</option>
+											</select>
+								    	</div>
+								    </div>
+								</div>
+
+								<div class="form-group pri_inv-formG">
+								    <label for="" class="col-md-12 pri_invLabel_titColor"><i>yml</i><b></b></label>
+								</div>
+								<div class="form-group pri_form-group">
+									    <div class="col-md-10 pri_col-md-10">
+									    	<dl class="col-sm-3">    									
+		    									<input id="pic" type="file" name = "yamlFile" />
+		    								</dl>
+									    </div>    
+								</div>
+								<div class="form-group pri_inv-formG">
+								    <label for="" class="col-md-12 pri_invLabel_titColor"><i>files</i><b></b></label>
+								</div>
+							   	<div class="form-group pri_form-group">
+								    <div class="col-md-10 pri_col-md-10">
+								    	<div class="pri_selectG pri_selectFlex">
+										    <label for="" class="control-label pri_selectLabel1">file:</label>
+										    <dl class="col-sm-3">
+		    								<input id="pic" type="file" name = "confFile"/>
+		    								</dl>
+		    								<label for="" class="control-label pri_selectLabel1">path:</label>
+										    <dl class="col-sm-3">
+		    									<input type="type" name="pathName" class="form-control orgtext" placeholder="upload path">
+		    								</dl>
+		    								<a class="delFileBtn">delete</a>
+										</div>
+								    </div>    
+								</div>
+								<div class="addConfigFile">									
+								</div>
+								<div class="form-group pri_form-group">								    
+								    <div class="col-md-10 pri_col-md-10">
+								    	<div class="pri_selectG pri_selectFlex">
+										    <label for="" class="control-label pri_selectLabel1"></label>
+										    <div class="pri_inv_checkBox">
+										    	<!-- <div class="row addOrg">
+										    	</div> -->
+				                                <a class="addConfigFileBtn">add more files+</a>
+				                            </div>
+										</div>
+								    </div>     
+								</div>
+							</div>
+					    </div>
+			    </div>
+				<div class="issueBtnG">
+					<i class="issueBtn issueBtn1 issueBtn2" id="deployBtn">OK</i>
+				</div>
+				  
+				</form>
+			</div>
+		</div>
+
+	<script type="text/javascript" src="../plugin/jquery/jquery.js"></script>
+
+	<script type="text/javascript" src="../plugin/bootstrap/bootstrap.js"></script>
+	<script type="text/javascript" src="../js/update.js"></script>
+	<script type="text/javascript" src="../js/common.js"></script>
+</body>
+</html>
