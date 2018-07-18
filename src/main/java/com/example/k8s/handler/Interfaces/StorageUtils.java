@@ -46,7 +46,7 @@ public abstract class StorageUtils {
         this.ip = ip;
     }
 
-    private StringBuffer getUrl() {
+    protected StringBuffer getUrl() {
         return new StringBuffer("nfs://" + ip + "/" + prefix);
     }
 
