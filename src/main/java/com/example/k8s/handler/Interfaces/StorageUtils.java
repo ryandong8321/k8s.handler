@@ -36,7 +36,7 @@ public abstract class StorageUtils {
      * @param pathAndFileName
      * @return return true if successfully saved.
      */
-    public abstract boolean save(InputStream file, String pathAndFileName);
+    public abstract boolean save(InputStream file, String path, String FileName);
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
