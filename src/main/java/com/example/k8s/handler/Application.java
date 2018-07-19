@@ -1,5 +1,6 @@
 package com.example.k8s.handler;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,8 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 @SpringBootApplication
 public class Application {
 	
-	private final String _KUBEURL="http://100.98.42.254:8001";
+	@Value("${k8s.api.url}")
+	private String _KUBEURL;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);

@@ -3,9 +3,6 @@ package com.example.k8s.handler.web;
 import static io.fabric8.kubernetes.api.KubernetesHelper.getPorts;
 import static io.fabric8.kubernetes.api.KubernetesHelper.getSelector;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.kubernetes.api.KubernetesHelper;
 import io.fabric8.kubernetes.api.model.Container;
-import io.fabric8.kubernetes.api.model.DoneableService;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Service;
@@ -124,11 +119,11 @@ public class K8sHandlerController {
 	
 	@RequestMapping(value="/createservice")
 	public String createService() {
-		File file=new File("C:\\uploadfiles\\apollo.yml");
-		try {
-			FileInputStream fis=new FileInputStream(file);
-			Pod pod=kube.pods().inNamespace("default").load(file).createOrReplaceWithNew().done();
-			logger.info("Pod name: ", KubernetesHelper.getName(pod));
+//		File file=new File("C:\\uploadfiles\\apollo.yml");
+//		try {
+//			FileInputStream fis=new FileInputStream(file);
+//			Pod pod=kube.pods().inNamespace("default").load(file).createOrReplaceWithNew().done();
+//			logger.info("Pod name: ", KubernetesHelper.getName(pod));
 			
 //			DoneableService dService=kube.services().inNamespace("default").load(fis).createOrReplaceWithNew();
 //			logger.info("Service kind {}", dService.getKind());
@@ -143,9 +138,9 @@ public class K8sHandlerController {
 //					}
 //				}
 //			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
 		return "DONE";
 	}
 }

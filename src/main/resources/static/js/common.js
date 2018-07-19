@@ -55,7 +55,11 @@ $.extend(window, {
         	});
         },
 
-        
+        killDialog: function() {
+        	$(".alert_wrapper").fadeOut(300, function() {
+        		$(this).remove();
+        	});
+        } 
 
 
 })

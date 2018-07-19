@@ -22,9 +22,11 @@ public class K8sHandlerService {
 	protected final String _KUBEURL="http://100.98.42.254:8001";
 	protected final String _DEFAULT_NAMESPACE="default";
 	
+	private KubernetesClient kube;
+	
 	public void updateService(String serviceName) throws Exception {
 		Config config = new ConfigBuilder().withMasterUrl(_KUBEURL).build();
-		KubernetesClient kube = new DefaultKubernetesClient(config);
+		kube = new DefaultKubernetesClient(config);
 		
 		ServiceList sevList=kube.services().inNamespace(_DEFAULT_NAMESPACE).list();
 		if (sevList!=null) {
@@ -48,7 +50,7 @@ public class K8sHandlerService {
 	
 	public void createDeployment(String filePath) throws FileNotFoundException {
 		Config config = new ConfigBuilder().withMasterUrl(_KUBEURL).build();
-		KubernetesClient kube = new DefaultKubernetesClient(config);
+		kube = new DefaultKubernetesClient(config);
 		
 		File file=new File("C:\\uploadfiles\\apollo.yml");
 		
@@ -112,9 +114,9 @@ public class K8sHandlerService {
 //			}
 			
 			K8sHandlerService service=new K8sHandlerService();
-//			service.createDeployment(null);
+			service.createDeployment(null);
 			
-			service.updateService("apollo");
+//			service.updateService("apollo");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -108,7 +108,7 @@
 
         $("#deployBtn").click(function(){
         	dialogCancel("Are you sure?","","",btnOK)
-        	
+//        	btnOK();
         })
 
         $("#formGroupB").on("click",".delFileBtn",function(){
@@ -118,8 +118,9 @@
 
 	function btnOK(){
 		$.each($(".addService"),function(){
-        		console.log($(this))
+        		console.log($(this));
         		$(this).submit();
+        		setTimeout(function(){}, 1000);
         })
 	}
 
@@ -148,6 +149,13 @@
 	        })
 		}
 	}
+	
+	function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+	} 
    
 })(jQuery);
 

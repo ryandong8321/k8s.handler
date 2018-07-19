@@ -1,19 +1,19 @@
 package com.example.k8s.handler.web;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.k8s.handler.entity.FileListObject;
+import com.example.k8s.handler.Interfaces.StorageUtils;
 import com.example.k8s.handler.service.K8sProcessService;
 
 @Controller
@@ -21,147 +21,124 @@ public class K8sHandlerUIController {
 	
 	protected final Logger logger=LoggerFactory.getLogger(getClass());
 	
-	private final String _UPLOADFILESPATH="C:/uploadfiles/";
-	private final String _YAMLFILESPATH="yaml/";
+	private final String _NAMESPACE_DEFAULT="/default";
 	
 	@Autowired
 	private K8sProcessService k8sProcessService;
+	
+	@Autowired
+	private StorageUtils storageUtils;
 	
     @RequestMapping("file")
     public String file(){
         return "/fileupload";
     }
     
-    /**
-     * 实现文件上传
-     * */
+    @RequestMapping("createinstance")
+    public String createInstance(){
+        return "/create";
+    }
+    
+    @RequestMapping("updateinstance")
+    public String updateInstance(){
+        return "/update";
+    }
+    
     @RequestMapping("fileUpload")
-    @ResponseBody 
-    public String fileUpload(@RequestParam("yamlFile") MultipartFile yamlFile, @RequestParam("confFile") MultipartFile[] confFile, @RequestParam("pathName") String[] pathName){
-//    	if (fileInfo!=null&&fileInfo.length>0) {
-//    		for (FileListObject fileObject:fileInfo) {
-//    			MultipartFile file=fileObject.getYamlFile();
-//    			
-//    			if(file.isEmpty()){
-//    	            return "false";
-//    	        }
-//    	        String fileName = file.getOriginalFilename();
-//    	        int size = (int) file.getSize();
-//    	        System.out.println(fileName + "-->" + size);
-//    	        
-//    	        String path = "C:/uploadfiles" ;
-//    	        File dest = new File(path + "/" + fileName);
-//    	        if(!dest.getParentFile().exists()){ //判断文件父目录是否存在
-//    	            dest.getParentFile().mkdir();
-//    	        }
-//    	        try {
-//    	            file.transferTo(dest); //保存文件
-//    	            return "true";
-//    	        } catch (IllegalStateException e) {
-//    	            // TODO Auto-generated catch block
-//    	            e.printStackTrace();
-//    	            return "false";
-//    	        } catch (IOException e) {
-//    	            // TODO Auto-generated catch block
-//    	            e.printStackTrace();
-//    	            return "false";
-//    	        }
-//    		}
-//    	}
-    	
+    public void fileUpload(HttpServletResponse response, @RequestParam("yamlFile") MultipartFile yamlFile, @RequestParam("confFile") MultipartFile[] confFile, @RequestParam("pathName") String[] pathName){
     	String fileName=null;
+    	boolean canCreate=false;
     	if (yamlFile!=null) {
     		fileName=yamlFile.getOriginalFilename();
-    		int size = (int) yamlFile.getSize();
-    		logger.info("yaml file size is {}", size);
-    		String path = _UPLOADFILESPATH + _YAMLFILESPATH;
-    		
+    		logger.info("yaml file name [{}]", fileName);
+    		canCreate=true;
     	}
     	
-    	if (confFile!=null&&fileName!=null&&!fileName.equals("")) {
-    		String confName=null;
-    		for (MultipartFile conf:confFile) {
+    	if (confFile!=null&&confFile.length>0&&fileName!=null&&!fileName.equals("")) {
+    		String confName=null, remotePath=_NAMESPACE_DEFAULT+"/"+fileName.substring(0, fileName.lastIndexOf("."));
+    		MultipartFile conf=null;
+    		for (int idx=0;idx<confFile.length;idx++) {
+    			conf=confFile[idx];
+    			if (conf.getSize()==0) {
+    				continue;
+    			}
+    			remotePath+="/"+pathName[idx];
     			confName=conf.getOriginalFilename();
+    			logger.info("upload conf file [{}] and remote path [{}]", confName, remotePath);
     			int size = (int) conf.getSize();
-        		logger.info("yaml file size is {}", size);
-        		String path = _UPLOADFILESPATH + File.pathSeparator + fileName.substring(0, fileName.lastIndexOf("."));
+        		try {
+        			logger.info("upload conf file [{}] to nfs server and size is [{}]", confName, size);
+        			canCreate=storageUtils.save(conf.getInputStream(), remotePath, confName);
+    				logger.info("upload conf file [{}] to nfs server and size is [{}] done", confName, size);
+    			} catch (IOException e) {
+    				logger.info("upload conf file [{}] to nfs server and size is [{}] exception", confName, size);
+    				canCreate=false;
+    				e.printStackTrace();
+    			}
     		}
     	}
     	
     	try {
-			k8sProcessService.createDeployment(null);
+    		if (canCreate) {
+    			logger.info("create deployment pod service in k8s according to yaml file");
+    			k8sProcessService.createDeployment(yamlFile.getInputStream());
+    			logger.info("create deployment pod service in k8s according to yaml file done");
+    		}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			logger.info("create deployment pod service in k8s according to yaml file exception");
+			e.printStackTrace();
+			canCreate=false;
+		} catch (IOException e) {
+			logger.info("create deployment pod service in k8s according to yaml file exception");
+			e.printStackTrace();
+			canCreate=false;
+		}
+    	
+    	try {
+			response.sendRedirect("/html/create.html?result="+canCreate);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	return "true";
     }
     
-    @RequestMapping("updatefileupload")
-    @ResponseBody 
-    public String fileUpload(@RequestParam("serviceName") String serviceName, @RequestParam("confFile") MultipartFile[] confFile, @RequestParam("pathName") String[] pathName){
-//    	if (fileInfo!=null&&fileInfo.length>0) {
-//    		for (FileListObject fileObject:fileInfo) {
-//    			MultipartFile file=fileObject.getYamlFile();
-//    			
-//    			if(file.isEmpty()){
-//    	            return "false";
-//    	        }
-//    	        String fileName = file.getOriginalFilename();
-//    	        int size = (int) file.getSize();
-//    	        System.out.println(fileName + "-->" + size);
-//    	        
-//    	        String path = "C:/uploadfiles" ;
-//    	        File dest = new File(path + "/" + fileName);
-//    	        if(!dest.getParentFile().exists()){ //判断文件父目录是否存在
-//    	            dest.getParentFile().mkdir();
-//    	        }
-//    	        try {
-//    	            file.transferTo(dest); //保存文件
-//    	            return "true";
-//    	        } catch (IllegalStateException e) {
-//    	            // TODO Auto-generated catch block
-//    	            e.printStackTrace();
-//    	            return "false";
-//    	        } catch (IOException e) {
-//    	            // TODO Auto-generated catch block
-//    	            e.printStackTrace();
-//    	            return "false";
-//    	        }
-//    		}
-//    	}
-    	
+    @RequestMapping("updatefile")
+    public void fileUpload(HttpServletResponse response, @RequestParam("yamlFile") MultipartFile yamlFile, @RequestParam("serviceName") String serviceName, @RequestParam("confFile") MultipartFile[] confFile, @RequestParam("pathName") String[] pathName){
+    	boolean result=true;
     	if (confFile!=null) {
-    		String confName=null;
-    		for (MultipartFile conf:confFile) {
+    		String confName=null, remotePath=_NAMESPACE_DEFAULT+"/"+serviceName;
+    		MultipartFile conf=null;
+    		for (int idx=0;idx<confFile.length;idx++) {
+    			conf=confFile[idx];
+    			remotePath+="/"+pathName[idx];
     			confName=conf.getOriginalFilename();
+    			logger.info("upload conf file [{}] and remote path [{}]", confName, remotePath);
     			int size = (int) conf.getSize();
-        		logger.info("yaml file size is {}", size);
-        		String path = _UPLOADFILESPATH + File.pathSeparator + serviceName;
+        		try {
+        			logger.info("upload conf file [{}] to nfs server and size is [{}]", confName, size);
+    				storageUtils.save(conf.getInputStream(), remotePath, confName);
+    				logger.info("upload conf file [{}] to nfs server and size is [{}] done", confName, size);
+    			} catch (IOException e) {
+    				logger.info("upload conf file [{}] to nfs server and size is [{}] exception", confName, size);
+    				result=false;
+    				e.printStackTrace();
+    			}
     		}
     	}
     	
     	try {
-			k8sProcessService.updateService(serviceName);
+    		if (yamlFile!=null&&yamlFile.getSize()>0) {
+    			k8sProcessService.updateService(serviceName, yamlFile.getInputStream());
+    		}else {
+    			k8sProcessService.updateService(serviceName);
+    		}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result=false;
+		}
+    	try {
+			response.sendRedirect("/html/update.html?result="+result);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	return "true";
     }
-    
-    /**
-     * 实现文件上传
-     * */
-    @RequestMapping("/v1/fileUpload")
-    @ResponseBody 
-    public String fileUploadObj(@ModelAttribute("fileListObject") FileListObject[] lst){
-    	if (lst!=null) {
-    		for (FileListObject item:lst) {
-    			logger.info("file {}", item.getYamlFile().getName());
-    		}
-    	}
-    	return "true";
-    }
-
 }

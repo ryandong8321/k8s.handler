@@ -9,7 +9,7 @@
 <body>
 	<div class="wrap">
 			<div class="container">
-			   <form class="form-horizontal pri_form-horizontal" id="updateService">
+			   <form class="form-horizontal pri_form-horizontal" id="updateService" action="/updatefile" method="post" enctype="multipart/form-data">
 				<div class="form-group">
 				    <label for="" class="col-md-3 pri_invLabel">update service</label>
 				</div>
@@ -23,7 +23,7 @@
 								<div class="pri_selectG pri_selectG1">
 									<div class="col-md-10 pri_col-md-10">
 								    	<div class="pri_selectG pri_selectFlex">
-											<select id="service" name="service" class="form-control pri_selecWidth pri_mine_selectWidth pri_inv_selectWidth financeScale" readonly>
+											<select id="service" name="serviceName" class="form-control pri_selecWidth pri_mine_selectWidth pri_inv_selectWidth financeScale" readonly>
 												<option value="0">allocres</option>
 												<option value="1">resolveref</option>
 											</select>
