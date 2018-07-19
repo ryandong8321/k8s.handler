@@ -121,7 +121,10 @@ public class K8sProcessService {
 					spec.setVolumes(java.util.Arrays.asList(volume));
 					deployment.getSpec().getTemplate().setSpec(spec);
 					
-					storageUtils.mkdir(nfsPath);
+					String createDir="/"+_DEFAULT_NAMESPACE+"/"+deployment.getMetadata().getName();
+					logger.info("create nfs path [{}]", createDir);
+					storageUtils.mkdir(createDir);
+					logger.info("create nfs path [{}] done", createDir);
 				}
 				Deployment result=kube.apps().deployments().inNamespace(_DEFAULT_NAMESPACE).createOrReplace(deployment);
 				logger.info("create deployment success {}", result.getMetadata().getName());
@@ -150,7 +153,10 @@ public class K8sProcessService {
 					spec.setVolumes(java.util.Arrays.asList(volume));
 					pod.setSpec(spec);
 					
-					storageUtils.mkdir(nfsPath);
+					String createDir="/"+_DEFAULT_NAMESPACE+"/"+pod.getMetadata().getName();
+					logger.info("create nfs path [{}]", createDir);
+					storageUtils.mkdir(createDir);
+					logger.info("create nfs path [{}] done", createDir);
 				}
 				Pod result=kube.pods().inNamespace(_DEFAULT_NAMESPACE).createOrReplace(pod);
 				logger.info("create deployment success {}", result.getMetadata().getName());
