@@ -22,7 +22,7 @@ public abstract class StorageUtils {
 	@Value("${nfs.prefix}")
     private String prefix;
 
-	@Value("${nfs.serverIp}")
+    @Value("${nfs.serverIp}")
     private String ip;
 
     /**
