@@ -12,8 +12,6 @@
  */
 package com.example.k8s.handler.service;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,18 +19,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.example.k8s.handler.Interfaces.StorageUtils;
 import com.sun.xfile.XFile;
 import com.sun.xfile.XFileOutputStream;
 
-import groovy.util.logging.Slf4j;
-import net.sf.jftp.system.logging.Log;
-
 @Component
-@Slf4j
 public class NFSutils extends StorageUtils {
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public static void main(String[] args) {
         StorageUtils stor = new NFSutils("home/bidteso/nfs", "100.98.42.254");
@@ -63,9 +60,9 @@ public class NFSutils extends StorageUtils {
 
     @Override
     public boolean save(InputStream file, String path, String fileName) {
-        System.out.println("build dirs: " + this.getUrl().append(path).toString());
+        logger.info("build dirs: " + this.getUrl().append(path).toString());
         buildPath(path);
-        System.out.println("write: " + this.getUrl().append(path).append("/" + fileName).toString());
+        logger.info("write: " + this.getUrl().append(path).append("/" + fileName).toString());
         return writeFile(file, this.getUrl().append(path).append("/" + fileName).toString());
     }
 
@@ -84,10 +81,15 @@ public class NFSutils extends StorageUtils {
             outputStream.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("file:" + file + " path" + pathAndFileName + e.toString());
             return false;
 
         }
         return true;
+    }
+
+    @Override
+    public void mkdir(String path) {
+        buildPath(path);
     }
 }
