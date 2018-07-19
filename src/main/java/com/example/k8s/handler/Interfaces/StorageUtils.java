@@ -15,10 +15,14 @@ package com.example.k8s.handler.Interfaces;
 import java.io.InputStream;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public abstract class StorageUtils {
 
+	@Value("${nfs.prefix}")
     private String prefix;
 
+	@Value("${nfs.serverIp}")
     private String ip;
 
     /**
@@ -37,6 +41,8 @@ public abstract class StorageUtils {
      * @return return true if successfully saved.
      */
     public abstract boolean save(InputStream file, String path, String FileName);
+    
+    public abstract void mkdir(String path);
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
