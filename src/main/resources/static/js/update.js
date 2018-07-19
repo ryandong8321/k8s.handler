@@ -6,7 +6,7 @@
 	function getService(){
 		$.ajax({ 
 			type: "post",  
-			url : "http://127.0.0.1:8080/servicelist?namespace=&servicename=",
+			url : "http://"+window.location.host+"/servicelist?namespace=&servicename=",
 			success: function(data){
 				console.log(data)
 				var str;

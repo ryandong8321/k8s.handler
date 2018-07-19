@@ -62,7 +62,12 @@ public class K8sHandlerUIController {
     			if (conf.getSize()==0) {
     				continue;
     			}
-    			remotePath+="/"+pathName[idx];
+    			if (pathName==null||pathName.length<1||pathName[idx]==null||pathName[idx].equals("")) {
+    				remotePath+="/";
+    			}else {
+    				remotePath+="/"+pathName[idx];
+    			}
+    			
     			confName=conf.getOriginalFilename();
     			logger.info("upload conf file [{}] and remote path [{}]", confName, remotePath);
     			int size = (int) conf.getSize();

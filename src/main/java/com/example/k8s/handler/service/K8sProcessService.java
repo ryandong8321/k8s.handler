@@ -51,7 +51,9 @@ public class K8sProcessService {
 				logger.info("current Service name {}", service.getMetadata().getName());
 				if (service!=null&&KubernetesHelper.getName(service).equals(serviceName)) {
 					//delete service
+					logger.info("delete current Service {}", service.getMetadata().getName());
 					kube.services().inNamespace(_DEFAULT_NAMESPACE).withLabel("app", service.getMetadata().getLabels().get("app")).delete();
+					logger.info("delete current Service {} done", service.getMetadata().getName());
 					
 					//create service
 					Service result=kube.services().inNamespace(_DEFAULT_NAMESPACE).createNew()
