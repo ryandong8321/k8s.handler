@@ -2,7 +2,6 @@
 	getService();
 	checkclick();
 	getResult();
-
 	function getService(){
 		$.ajax({ 
 			type: "post",  
