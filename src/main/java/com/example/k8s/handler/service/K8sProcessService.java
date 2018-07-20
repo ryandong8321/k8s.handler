@@ -20,9 +20,9 @@ import io.fabric8.kubernetes.api.model.NFSVolumeSource;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 
 @Component
@@ -45,39 +45,108 @@ public class K8sProcessService {
 	private StorageUtils storageUtils;
 	
 	public void updateService(String serviceName) throws Exception {
-		ServiceList sevList=kube.services().inNamespace(_DEFAULT_NAMESPACE).list();
+//		ServiceList sevList=kube.services().inNamespace(_DEFAULT_NAMESPACE).list();
+//		if (sevList!=null) {
+//			for (Service service:sevList.getItems()) {
+//				logger.info("current Service name {}", service.getMetadata().getName());
+//				if (service!=null&&KubernetesHelper.getName(service).equals(serviceName)) {
+//					//delete service
+//					logger.info("delete current Service {}", service.getMetadata().getName());
+//					kube.services().inNamespace(_DEFAULT_NAMESPACE).withLabel("app", service.getMetadata().getLabels().get("app")).delete();
+//					logger.info("delete current Service {} done", service.getMetadata().getName());
+//					
+//					//create service
+//					Service result=kube.services().inNamespace(_DEFAULT_NAMESPACE).createNew()
+//					.withApiVersion(service.getApiVersion())
+//					.withNewMetadata().withName(serviceName).addToLabels("app", serviceName).endMetadata()
+//					.withSpec(service.getSpec()).done();
+//					logger.info("update Service success {}", result.getMetadata().getName());
+//					break;
+//				}
+//			}
+//		}
+		
+		DeploymentList sevList=kube.apps().deployments().inNamespace(_DEFAULT_NAMESPACE).list();
 		if (sevList!=null) {
-			for (Service service:sevList.getItems()) {
-				logger.info("current Service name {}", service.getMetadata().getName());
+			for (Deployment service:sevList.getItems()) {
+				logger.info("current Deployment name {}", service.getMetadata().getName());
 				if (service!=null&&KubernetesHelper.getName(service).equals(serviceName)) {
 					//delete service
-					logger.info("delete current Service {}", service.getMetadata().getName());
-					kube.services().inNamespace(_DEFAULT_NAMESPACE).withLabel("app", service.getMetadata().getLabels().get("app")).delete();
-					logger.info("delete current Service {} done", service.getMetadata().getName());
+//					kube.services().inNamespace(_DEFAULT_NAMESPACE).withLabel("app", service.getMetadata().getLabels().get("app")).delete();
+					
+					kube.apps().deployments().inNamespace(_DEFAULT_NAMESPACE).delete(service);			
 					
 					//create service
-					Service result=kube.services().inNamespace(_DEFAULT_NAMESPACE).createNew()
-					.withApiVersion(service.getApiVersion())
-					.withNewMetadata().withName(serviceName).addToLabels("app", serviceName).endMetadata()
-					.withSpec(service.getSpec()).done();
+					service.getMetadata().setResourceVersion(null);
+					Deployment result=kube.apps().deployments().inNamespace(_DEFAULT_NAMESPACE).createOrReplace(service);
 					logger.info("update Service success {}", result.getMetadata().getName());
 					break;
 				}
 			}
 		}
+		
+		
 	}
 	
 	public void updateService(String serviceName, InputStream yamlStream) throws Exception {
-		ServiceList sevList=kube.services().inNamespace(_DEFAULT_NAMESPACE).list();
-		if (sevList!=null) {
-			for (Service service:sevList.getItems()) {
+		boolean canOperate=false;
+		Deployment yamlDep=null;
+		
+		List<HasMetadata> resources = kube.load(yamlStream).get();
+		if (resources.isEmpty()) {
+			logger.info("yaml file is empty");
+		}else {
+			for (HasMetadata resource:resources) {
+				if (resource instanceof Deployment) {
+					yamlDep=(Deployment)resource;
+					if (serviceName.equals(yamlDep.getMetadata().getName())){
+						
+						PodSpec spec=yamlDep.getSpec().getTemplate().getSpec();
+						
+						List<Volume> lstVolume=spec.getVolumes();
+						boolean addNFSVolume=true;
+						if (lstVolume!=null&&!lstVolume.isEmpty()) {
+							for (Volume vol:lstVolume) {
+								if (vol!=null&&vol.getName()!=null&&vol.getName().equals("nfs")) {
+									addNFSVolume=false;
+									break;
+								}
+							}
+						}
+						
+						if (addNFSVolume) {
+							Volume volume=new Volume();
+							volume.setName("nfs");
+							String nfsPath="/"+_DEFAULT_NFS_PATH+"/"+_DEFAULT_NAMESPACE+"/"+yamlDep.getMetadata().getName();
+							logger.info("nfs path is [{}]", nfsPath);
+							NFSVolumeSource nfs=new NFSVolumeSource(nfsPath, false, _DEFAULT_NFS_IP);
+							volume.setNfs(nfs);
+							spec.setVolumes(java.util.Arrays.asList(volume));
+							yamlDep.getSpec().getTemplate().setSpec(spec);
+							
+							String createDir="/"+_DEFAULT_NAMESPACE+"/"+yamlDep.getMetadata().getName();
+							logger.info("create nfs path [{}]", createDir);
+							storageUtils.mkdir(createDir);
+							logger.info("create nfs path [{}] done", createDir);
+						}
+						
+						canOperate=true;
+						break;
+					}
+				}
+			}
+		}
+		
+		DeploymentList sevList=kube.apps().deployments().inNamespace(_DEFAULT_NAMESPACE).list();
+		if (sevList!=null&&canOperate&&yamlDep!=null) {
+			for (Deployment service:sevList.getItems()) {
 				logger.info("current Service name {}", service.getMetadata().getName());
 				if (service!=null&&KubernetesHelper.getName(service).equals(serviceName)) {
 					//delete service
-					kube.services().inNamespace(_DEFAULT_NAMESPACE).withLabel("app", service.getMetadata().getLabels().get("app")).delete();
+//					kube.services().inNamespace(_DEFAULT_NAMESPACE).withLabel("app", service.getMetadata().getLabels().get("app")).delete();
 					
 					//create service
-					Service result=kube.services().inNamespace(_DEFAULT_NAMESPACE).load(yamlStream).createOrReplaceWithNew().done();
+					Deployment result=kube.apps().deployments().inNamespace(_DEFAULT_NAMESPACE).createOrReplace(yamlDep);
 					logger.info("update Service success {}", result.getMetadata().getName());
 					break;
 				}

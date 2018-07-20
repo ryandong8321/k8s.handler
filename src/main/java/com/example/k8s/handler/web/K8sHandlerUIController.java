@@ -109,12 +109,21 @@ public class K8sHandlerUIController {
     @RequestMapping("updatefile")
     public void fileUpload(HttpServletResponse response, @RequestParam("yamlFile") MultipartFile yamlFile, @RequestParam("serviceName") String serviceName, @RequestParam("confFile") MultipartFile[] confFile, @RequestParam("pathName") String[] pathName){
     	boolean result=true;
-    	if (confFile!=null) {
+    	if (confFile!=null&&confFile.length>0) {
     		String confName=null, remotePath=_NAMESPACE_DEFAULT+"/"+serviceName;
     		MultipartFile conf=null;
     		for (int idx=0;idx<confFile.length;idx++) {
     			conf=confFile[idx];
-    			remotePath+="/"+pathName[idx];
+    			
+    			if (conf.getSize()==0) {
+    				continue;
+    			}
+    			if (pathName==null||pathName.length<1||pathName[idx]==null||pathName[idx].equals("")) {
+    				remotePath+="/";
+    			}else {
+    				remotePath+="/"+pathName[idx];
+    			}
+    			
     			confName=conf.getOriginalFilename();
     			logger.info("upload conf file [{}] and remote path [{}]", confName, remotePath);
     			int size = (int) conf.getSize();
