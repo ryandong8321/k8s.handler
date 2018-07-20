@@ -61,6 +61,11 @@
 		if(result!=null && result!=""){
 			var text = result;
 			var bText = "OK";
+			if(result == "true"){
+				text = "successfully!";
+			}else{
+				text = "failed!";
+			}
 	        // console.log($(".alert_wrapper").length === 0)
 	        if(!$(".alert_wrapper").length){
 	            creatDialog();

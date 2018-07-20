@@ -128,6 +128,11 @@
 		var result=getQueryString("result");
 		if(result!=null && result!=""){
 			var text = result;
+			if(result == "true"){
+				text = "successfully!";
+			}else{
+				text = "failed!";
+			}
 			var bText = "OK";
 	        // console.log($(".alert_wrapper").length === 0)
 	        if(!$(".alert_wrapper").length){
